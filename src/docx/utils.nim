@@ -5,8 +5,8 @@ import zip / zipFiles
 
 let
   # UpperLetters = {'A' .. 'Z'}
-  TestFile = "./test.docx"  
-  TempDir = getTempDir() / "docx_windx_tmp" 
+  TestFile = "./test.docx"
+  TempDir = getTempDir() / "docx_windx_tmp"
 assert existsFile(TestFile)
 
 template `=?=`(a, b: string): bool =
@@ -14,7 +14,6 @@ template `=?=`(a, b: string): bool =
 
 proc matchKindName(x: XmlParser, kind: XmlEventKind, name: string): bool {.inline.} =
   x.kind == kind and x.elementName =?= name
-
 
 proc extractXml*(fileName: string) =
   var z: ZipArchive
@@ -36,7 +35,7 @@ proc parseDocument*(fileName: string): string =
   if s == nil: quit("cannot open the file" & fileName)
   var x: XmlParser
   defer: x.close()
-  open(x, s, fileName)
+  open(x, s, fileName, {reportWhitespace})
 
   while true:
     x.next()
@@ -47,9 +46,14 @@ proc parseDocument*(fileName: string): string =
         if x.matchKindName(xmlElementStart, "w:t"):
           # ignore <w:t>
           x.next()
-          while x.kind == xmlCharData:
-            result &= x.charData
-            x.next()
+          while true:
+            case x.kind
+            of xmlCharData, xmlWhitespace:
+              result &= x.charData
+            else:
+              break
+            # ignore </w:t>
+            x.next() 
         elif x.matchKindName(xmlElementOpen, "w:t"):
           # ignore <w:t>
           x.next()
@@ -57,9 +61,14 @@ proc parseDocument*(fileName: string): string =
             x.next()
           # ignore >
           x.next()
-          while x.kind == xmlCharData:
-            result &= x.charData
-            x.next()
+          while true:
+            case x.kind
+            of xmlCharData, xmlWhitespace:
+              result &= x.charData
+            else:
+              break
+            # ignore </w:t>
+            x.next()            
         elif x.matchKindName(xmlElementEnd, "w:p"):
           break
         else:
@@ -70,7 +79,7 @@ proc parseDocument*(fileName: string): string =
     else:
       discard
 
-iterator docLines*(fileName: string): string = 
+iterator docLines*(fileName: string): string =
   # unpack docx
   extractXml(fileName)
   defer: removeDir(TempDir)
@@ -80,7 +89,7 @@ iterator docLines*(fileName: string): string =
   if s == nil: quit("cannot open the file" & fileName)
   var x: XmlParser
   defer: x.close()
-  open(x, s, fileName)
+  open(x, s, fileName, {reportWhitespace})
 
   var res: string
   while true:
@@ -103,9 +112,14 @@ iterator docLines*(fileName: string): string =
             x.next()
           # ignore >
           x.next()
-          while x.kind == xmlCharData:
-            res &= x.charData
-            x.next()
+          while true:
+            case x.kind
+            of xmlCharData, xmlWhitespace:
+              res &= x.charData
+            else:
+              break
+            # ignore </w:t>
+            x.next()    
         elif x.matchKindName(xmlElementEnd, "w:p"):
           break
         else:
@@ -115,6 +129,7 @@ iterator docLines*(fileName: string): string =
       break
     else:
       discard
+
 
 when isMainModule:
   echo TempDir
