@@ -15,15 +15,15 @@ template `=?=`(a, b: string): bool =
 proc matchKindName(x: XmlParser, kind: XmlEventKind, name: string): bool {.inline.} =
   x.kind == kind and x.elementName =?= name
 
-proc extractXml*(fileName: string) =
+proc extractXml*(src: string, dest: string = TempDir) =
   var z: ZipArchive
-  if not z.open(fileName):
+  if not z.open(src):
     echo "Opening zip failed"
     quit(1)
-  z.extractAll(TempDir)
+  z.extractAll(dest)
   z.close()
-  assert existsDir(TempDir / "word")
-  assert existsFile(TempDir / "word/document.xml")
+  assert existsDir(dest / "word")
+  assert existsFile(dest / "word/document.xml")
 
 proc parseDocument*(fileName: string): string =
   # unpack docx

@@ -2,7 +2,7 @@
 
 version       = "0.1.0"
 author        = "flywind"
-description   = "A new awesome nimble package"
+description   = "A simple docx reader."
 license       = "MIT"
 srcDir        = "src"
 
