@@ -7,7 +7,6 @@ let
   # UpperLetters = {'A' .. 'Z'}
   TestFile = "./test.docx"
   TempDir = getTempDir() / "docx_windx_tmp"
-assert existsFile(TestFile)
 
 template `=?=`(a, b: string): bool =
   cmpIgnoreCase(a, b) == 0
@@ -132,6 +131,7 @@ iterator docLines*(fileName: string): string =
 
 
 when isMainModule:
+  assert existsFile(TestFile)
   echo TempDir
   echo parseDocument("test.docx")
   for line in docLines("test.docx"):

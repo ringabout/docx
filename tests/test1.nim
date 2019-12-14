@@ -8,5 +8,10 @@
 import unittest
 
 import docx
-test "can add":
-  check add(5, 5) == 10
+
+test "can parse":
+  echo parseDocument("../src/docx/test.docx")
+
+test "can read line":
+  for line in docLines("../src/docx/test.docx"):
+    echo line
