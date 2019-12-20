@@ -6,7 +6,7 @@ import zip / zipFiles
 let
   # UpperLetters = {'A' .. 'Z'}
   TestFile = "./test.docx"
-  TempDir = getTempDir() / "docx_windx_tmp"
+  TempDir* = getTempDir() / "docx_windx_tmp"
 
 template `=?=`(a, b: string): bool =
   cmpIgnoreCase(a, b) == 0
