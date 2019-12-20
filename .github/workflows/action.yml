@@ -27,7 +27,7 @@ jobs:
         key: ${{ runner.os }}-nimble-stable
     - uses: jiro4989/setup-nim-action@master
     - name: Install docx
-      run: nimble install docx
+      run: nimble install docx -y
     - name: Test command
       run: nimble test
 
