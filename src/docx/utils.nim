@@ -15,14 +15,15 @@ proc matchKindName(x: XmlParser, kind: XmlEventKind, name: string): bool {.inlin
   x.kind == kind and x.elementName =?= name
 
 proc extractXml*(src: string, dest: string = TempDir) =
+  if not existsFile(src):
+    raise newException(IOError, "No such file: " & src)
   var z: ZipArchive
   if not z.open(src):
-    echo "Opening zip failed"
-    quit(1)
+    raise newException(IOError, "[ZIP] Can't open file: " & src)
   z.extractAll(dest)
   z.close()
-  assert existsDir(dest / "word")
-  assert existsFile(dest / "word/document.xml")
+  # assert existsDir(dest / "word")
+  # assert existsFile(dest / "word/document.xml")
 
 proc parsePureText*(fileName: string): string =
   # unpack docx
