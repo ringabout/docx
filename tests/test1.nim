@@ -10,11 +10,11 @@ import unittest
 import docx
 
 test "can parse pure text":
-  echo parsePureText("../src/docx/test.docx")
+  echo parsePureText("src/docx/test.docx")
 
 test "can parse":
-  echo parseDocument("../src/docx/test.docx")
+  echo parseDocument("src/docx/test.docx")
 
 test "can read line":
-  for line in docLines("../src/docx/test.docx"):
+  for line in docLines("src/docx/test.docx"):
     echo line
