@@ -16,5 +16,4 @@ requires "zip >= 0.2.1"
 
 # tests
 task test, "Run all tests":
-  exec "nim c -r --threads:off tests/test1"
-  exec "nim c -r --threads:on tests/test1"
+  exec "nim c -r tests/test1"
