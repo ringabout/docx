@@ -24,6 +24,30 @@ proc extractXml*(src: string, dest: string = TempDir) =
   assert existsDir(dest / "word")
   assert existsFile(dest / "word/document.xml")
 
+proc parsePureText*(fileName: string): string =
+  # unpack docx
+  extractXml(fileName)
+  defer: removeDir(TempDir)
+  let fileName = TempDir / "word/document.xml"
+  # open xml file
+  var s = newFileStream(fileName, fmRead)
+  if s == nil: quit("cannot open the file" & fileName)
+  var x: XmlParser
+  defer: x.close()
+  open(x, s, fileName, {reportWhitespace})
+
+  while true:
+    x.next()
+    case x.kind
+    of xmlCharData, xmlWhitespace:
+      result &= x.charData
+    of xmlEof:
+      break
+    else:
+      discard
+      
+
+
 proc parseDocument*(fileName: string): string =
   # unpack docx
   extractXml(fileName)
@@ -133,6 +157,7 @@ iterator docLines*(fileName: string): string =
 when isMainModule:
   assert existsFile(TestFile)
   echo TempDir
+  echo parsePureText("test.docx")
   echo parseDocument("test.docx")
   for line in docLines("test.docx"):
     echo line
