@@ -149,7 +149,7 @@ iterator docLines*(fileName: string): string =
     else:
       discard
 
-proc extracPicture*(src, dest: string) =
+proc extractPicture*(src, dest: string) =
   # unpack docx
   extractXml(src)
   defer: removeDir(TempDir)
