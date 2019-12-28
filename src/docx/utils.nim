@@ -4,8 +4,6 @@ import zip / zipFiles
 
 
 let
-  # UpperLetters = {'A' .. 'Z'}
-  TestFile = "./test.docx"
   TempDir* = getTempDir() / "docx_windx_tmp"
 
 template `=?=`(a, b: string): bool =
@@ -14,7 +12,7 @@ template `=?=`(a, b: string): bool =
 proc matchKindName(x: XmlParser, kind: XmlEventKind, name: string): bool {.inline.} =
   x.kind == kind and x.elementName =?= name
 
-proc extractXml*(src: string, dest: string = TempDir) =
+proc extractXml*(src: string, dest: string = TempDir) {.inline.} =
   if not existsFile(src):
     raise newException(IOError, "No such file: " & src)
   var z: ZipArchive
@@ -22,10 +20,8 @@ proc extractXml*(src: string, dest: string = TempDir) =
     raise newException(IOError, "[ZIP] Can't open file: " & src)
   z.extractAll(dest)
   z.close()
-  # assert existsDir(dest / "word")
-  # assert existsFile(dest / "word/document.xml")
 
-proc parsePureText*(fileName: string): string =
+proc parsePureText*(fileName: string): string {.inline.} =
   # unpack docx
   extractXml(fileName)
   defer: removeDir(TempDir)
@@ -46,10 +42,9 @@ proc parsePureText*(fileName: string): string =
       break
     else:
       discard
-      
 
 
-proc parseDocument*(fileName: string): string =
+proc parseDocument*(fileName: string): string {.inline.} =
   # unpack docx
   extractXml(fileName)
   defer: removeDir(TempDir)
@@ -77,7 +72,7 @@ proc parseDocument*(fileName: string): string =
             else:
               break
             # ignore </w:t>
-            x.next() 
+            x.next()
         elif x.matchKindName(xmlElementOpen, "w:t"):
           # ignore <w:t>
           x.next()
@@ -92,7 +87,7 @@ proc parseDocument*(fileName: string): string =
             else:
               break
             # ignore </w:t>
-            x.next()            
+            x.next()
         elif x.matchKindName(xmlElementEnd, "w:p"):
           break
         else:
@@ -143,7 +138,7 @@ iterator docLines*(fileName: string): string =
             else:
               break
             # ignore </w:t>
-            x.next()    
+            x.next()
         elif x.matchKindName(xmlElementEnd, "w:p"):
           break
         else:
@@ -154,11 +149,19 @@ iterator docLines*(fileName: string): string =
     else:
       discard
 
+proc extracPicture*(src, dest: string) =
+  # unpack docx
+  extractXml(src)
+  defer: removeDir(TempDir)
+  let fileName = TempDir / "word/media"
+  if not existsDir(dest):
+    createDir(dest)
+  if existsDir(fileName):
+    moveDir(fileName, dest)
+
 
 when isMainModule:
-  assert existsFile(TestFile)
-  echo TempDir
-  echo parsePureText("test.docx")
-  echo parseDocument("test.docx")
-  for line in docLines("test.docx"):
+  echo parsePureText("../../tests/test.docx")
+  echo parseDocument("../../tests/test.docx")
+  for line in docLines("../../tests/test.docx"):
     echo line
