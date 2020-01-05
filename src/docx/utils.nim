@@ -11,6 +11,9 @@ template `=?=`(a, b: string): bool =
 
 proc matchKindName(x: XmlParser, kind: XmlEventKind, name: string): bool {.inline.} =
   x.kind == kind and x.elementName =?= name
+  
+when defined(windows):
+  {.passl: "-lz".}
 
 proc extractXml*(src: string, dest: string = TempDir) {.inline.} =
   if not existsFile(src):
