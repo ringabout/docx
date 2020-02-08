@@ -1,4 +1,4 @@
-# docx
+# docx [![nimble](https://raw.githubusercontent.com/yglukhov/nimble-tag/master/nimble.png)](https://github.com/yglukhov/nimble-tag)
 A dead simple docx reader. 
 
 Read pure text from docx written by Nim.
